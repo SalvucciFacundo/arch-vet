@@ -103,15 +103,15 @@ layers:
 | Rule ID | Name | Description | Severity |
 | :--- | :--- | :--- | :--- |
 | `ARCH001` | `forbidden-import` | Package imports a forbidden layer or external infrastructure driver | Error |
-| `ARCH002` | `domain-leaky-type` | Domain structs or signatures expose infrastructure types *(In progress)* | Error |
-| `ARCH003` | `producer-interface` | Interfaces declared alongside implementations instead of consumer *(In progress)* | Warning |
+| `ARCH002` | `domain-leaky-type` | Domain structs or signatures expose infrastructure types | Error |
+| `ARCH003` | `producer-interface` | Interfaces declared inside adapter/infra instead of consumer package | Warning |
 
 ---
 
 ## Roadmap
 
 - [x] **Phase 1:** Core AST loader, zero-config presets, `ARCH001` rule, terminal/json/agent reporting.
-- [ ] **Phase 2:** Semantic deep rules (`ARCH002` leaky types, `ARCH003` producer interfaces).
+- [x] **Phase 2:** Semantic deep rules (`ARCH002` leaky types, `ARCH003` producer interfaces).
 - [ ] **Phase 3:** Built-in Model Context Protocol (`arch-vet mcp`) stdio server for native Claude Code and Cursor integration.
 - [ ] **Phase 4:** GitHub Action and SARIF report generation.
 

@@ -10,6 +10,8 @@ func NewEngine() *Engine {
 	return &Engine{
 		rules: []Rule{
 			&ForbiddenImportRule{},
+			&DomainLeakRule{},
+			&ProducerInterfaceRule{},
 		},
 	}
 }
