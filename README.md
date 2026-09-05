@@ -3,6 +3,7 @@
 > **AI-Native Architecture Linter & Guardrail for Go**
 
 [![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white)](https://golang.org)
+[![CI](https://github.com/SalvucciFacundo/arch-vet/actions/workflows/ci.yml/badge.svg)](https://github.com/SalvucciFacundo/arch-vet/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `arch-vet` protects your Go codebase from architectural rot and boundary violations during rapid development and autonomous AI agent coding sessions (Claude Code, Cursor, Copilot, Aider).
@@ -113,7 +114,7 @@ Exposed MCP Tools:
 - [x] **Phase 1:** Core AST loader, zero-config presets, `ARCH001` rule, terminal/json/agent reporting.
 - [x] **Phase 2:** Semantic deep rules (`ARCH002` leaky types, `ARCH003` producer interfaces).
 - [x] **Phase 3:** Built-in Model Context Protocol (`arch-vet mcp`) stdio server for native Claude Code and Cursor integration.
-- [ ] **Phase 4:** GitHub Action and SARIF report generation.
+- [x] **Phase 4:** GitHub Actions CI matrix and multi-platform release automation via GoReleaser.
 
 ---
 

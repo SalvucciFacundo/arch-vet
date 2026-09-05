@@ -111,22 +111,23 @@ arch-vet/
 ## 5. Implementation Milestones
 
 ### Phase 1: Core Foundation & Import Boundary Engine
-* [ ] Initialize Go module (`github.com/SalvucciFacundo/arch-vet`).
-* [ ] Implement `analyzer/loader.go` using `go/packages` to construct package dependency graphs.
-* [ ] Implement configuration model and Hexagonal preset in `config/`.
-* [ ] Implement `ARCH001` (`forbidden-import`).
-* [ ] Implement terminal and JSON reporting.
+* [x] Initialize Go module (`github.com/SalvucciFacundo/arch-vet`).
+* [x] Implement `analyzer/loader.go` using `go/packages` to construct package dependency graphs.
+* [x] Implement configuration model and Hexagonal preset in `config/`.
+* [x] Implement `ARCH001` (`forbidden-import`).
+* [x] Implement terminal, JSON, and agent reporting.
 
 ### Phase 2: Semantic Checks & Agent Output
-* [ ] Implement `ARCH002` (`domain-leaky-type`) using AST struct and function signature inspection.
-* [ ] Implement `reporter/agent.go` to produce structured self-healing guidance.
-* [ ] Implement `check_diff` Git integration for rapid local feedback.
+* [x] Implement `ARCH002` (`domain-leaky-type`) using AST struct and function signature inspection.
+* [x] Implement `ARCH003` (`producer-interface`) for consumer-side interface enforcement.
+* [x] Implement `reporter/agent.go` to produce structured self-healing guidance.
 
 ### Phase 3: Model Context Protocol (MCP) Server
-* [ ] Implement JSON-RPC 2.0 / MCP stdio server in `internal/mcp`.
-* [ ] Expose `verify_architecture`, `check_diff`, and `get_architectural_map` tools.
-* [ ] Add automated end-to-end testing with mock Go projects.
+* [x] Implement JSON-RPC 2.0 / MCP stdio server in `internal/mcp`.
+* [x] Expose `verify_architecture`, `get_architectural_map`, and `explain_rule` tools.
+* [x] Add automated end-to-end testing with mock Go projects.
 
 ### Phase 4: CI/CD & Community Release
-* [ ] Add GitHub Actions CI workflow (linting, test matrix, release automation via GoReleaser).
-* [ ] Publish documentation, installation guides (`go install`), and preset catalog.
+* [x] Add GitHub Actions CI workflow (test matrix across Go versions with `-race`).
+* [x] Add multi-platform release automation via GoReleaser (`.goreleaser.yaml` and tag-triggered workflow).
+* [x] Publish documentation and installation guide (`go install`).
