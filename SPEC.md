@@ -131,3 +131,11 @@ arch-vet/
 * [x] Add GitHub Actions CI workflow (test matrix across Go versions with `-race`).
 * [x] Add multi-platform release automation via GoReleaser (`.goreleaser.yaml` and tag-triggered workflow).
 * [x] Publish documentation and installation guide (`go install`).
+
+---
+
+## 6. Future Roadmap: v0.2.0 Planned Enhancements
+
+* [ ] **Fast Git Diff Mode (`--diff` & `check_diff` MCP tool):** Inspect only files modified in the active Git index/working tree for sub-50ms feedback loops.
+* [ ] **SARIF Report Generator (`--format sarif`):** Native integration with GitHub Code Scanning to render line-level annotations on Pull Requests.
+* [ ] **Inline Suppression Comments (`// arch-vet:ignore <rule>`):** Allow progressive refactoring and debt management in legacy codebases.
