@@ -70,31 +70,31 @@ Please fix the following architectural regressions before finalizing your change
 * **Self-Healing Action:** Define an abstraction or interface in layer "domain" or an adjacent ports layer, and inject the concrete implementation from an outer adapter layer.
 ```
 
-### 4. Custom Configuration (Optional)
+### 5. MCP Server (For Claude Code, Cursor & Antigravity)
 
-Create `.arch-vet.yaml` in your project root:
+`arch-vet` provides a native Model Context Protocol (MCP) server over `stdio` so that AI coding agents can verify architecture and read boundaries dynamically.
 
-```yaml
-version: v1
-architecture: custom
-layers:
-  - name: domain
-    description: Core enterprise entities
-    patterns:
-      - "internal/domain/**"
-    may_depend_on: []
-    deny_external:
-      - "database/sql"
-      - "gorm.io/gorm"
-      - "net/http"
-
-  - name: adapters
-    description: Inbound and outbound adapters
-    patterns:
-      - "internal/adapters/**"
-    may_depend_on:
-      - domain
+#### Start the Server:
+```bash
+arch-vet mcp
 ```
+
+#### Add to Claude Code or Cursor (`~/.config/claude/claude_desktop_config.json` or agent settings):
+```json
+{
+  "mcpServers": {
+    "arch-vet": {
+      "command": "arch-vet",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+Exposed MCP Tools:
+* `verify_architecture`: Audits the workspace and returns structured violations with actionable self-healing steps.
+* `get_architectural_map`: Gives the AI the blueprint of layers and allowed dependency flows before it writes code.
+* `explain_rule`: Explains the architectural principle and shows idiomatic Go refactoring patterns.
 
 ---
 
@@ -112,7 +112,7 @@ layers:
 
 - [x] **Phase 1:** Core AST loader, zero-config presets, `ARCH001` rule, terminal/json/agent reporting.
 - [x] **Phase 2:** Semantic deep rules (`ARCH002` leaky types, `ARCH003` producer interfaces).
-- [ ] **Phase 3:** Built-in Model Context Protocol (`arch-vet mcp`) stdio server for native Claude Code and Cursor integration.
+- [x] **Phase 3:** Built-in Model Context Protocol (`arch-vet mcp`) stdio server for native Claude Code and Cursor integration.
 - [ ] **Phase 4:** GitHub Action and SARIF report generation.
 
 ---

@@ -7,6 +7,7 @@ import (
 
 	"github.com/SalvucciFacundo/arch-vet/internal/analyzer"
 	"github.com/SalvucciFacundo/arch-vet/internal/config"
+	"github.com/SalvucciFacundo/arch-vet/internal/mcp"
 	"github.com/SalvucciFacundo/arch-vet/internal/reporter"
 	"github.com/SalvucciFacundo/arch-vet/internal/rules"
 	"gopkg.in/yaml.v3"
@@ -15,6 +16,14 @@ import (
 var Version = "0.1.0-dev"
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "mcp" {
+		server := mcp.NewServer(Version)
+		if err := server.Serve(os.Stdin, os.Stdout); err != nil {
+			fmt.Fprintf(os.Stderr, "MCP server error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 	dirFlag := flag.String("dir", ".", "Root directory of the Go project")
 	presetFlag := flag.String("preset", "", "Architecture preset (hexagonal, clean). Defaults to auto-detection")
 	configFlag := flag.String("config", ".arch-vet.yaml", "Path to configuration file")
