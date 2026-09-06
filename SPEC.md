@@ -137,5 +137,5 @@ arch-vet/
 ## 6. Future Roadmap: v0.2.0 Planned Enhancements
 
 * [x] **Fast Git Diff Mode (`--diff` & `check_diff` MCP tool):** Inspect only files modified in the active Git index/working tree for sub-50ms feedback loops.
+* [x] **Inline Suppression Comments (`// arch-vet:ignore <rule>`):** Allow progressive refactoring and debt management in legacy codebases.
 * [ ] **SARIF Report Generator (`--format sarif`):** Native integration with GitHub Code Scanning to render line-level annotations on Pull Requests.
-* [ ] **Inline Suppression Comments (`// arch-vet:ignore <rule>`):** Allow progressive refactoring and debt management in legacy codebases.

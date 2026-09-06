@@ -97,6 +97,24 @@ Please fix the following architectural regressions before finalizing your change
 * **Self-Healing Action:** Pass a pure Go struct (command/query DTO) or context.Context instead of http.Request.
 ```
 
+### 4. Inline Suppression (Legacy Codebases & Debt Management)
+
+You can temporarily suppress specific architectural warnings directly in source code using comments:
+
+```go
+// Suppress a specific rule on the following line
+// arch-vet:ignore ARCH001
+import "database/sql"
+
+// Suppress on the same line
+type User struct {
+    DB *sql.DB // arch-vet:ignore ARCH002
+}
+
+// Suppress all rules on the target line
+import "net/http" // arch-vet:ignore
+```
+
 ---
 
 ## MCP Server (For AI Agents)

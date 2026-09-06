@@ -21,12 +21,25 @@ func (e *Engine) RegisterRule(r Rule) {
 	e.rules = append(e.rules, r)
 }
 
-// Evaluate runs all registered rules against the project context.
+// Evaluate runs all registered rules against the project context, filtering suppressed violations.
 func (e *Engine) Evaluate(ctx *Context) []Diagnostic {
 	var allDiagnostics []Diagnostic
 	for _, rule := range e.rules {
 		diags := rule.Evaluate(ctx)
 		allDiagnostics = append(allDiagnostics, diags...)
 	}
-	return allDiagnostics
+
+	if ctx.Project == nil || len(allDiagnostics) == 0 {
+		return allDiagnostics
+	}
+
+	suppMap := BuildSuppressionMap(ctx.Project)
+	var filtered []Diagnostic
+	for _, d := range allDiagnostics {
+		if !suppMap.IsSuppressed(d) {
+			filtered = append(filtered, d)
+		}
+	}
+
+	return filtered
 }
