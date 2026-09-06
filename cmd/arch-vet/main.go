@@ -30,7 +30,7 @@ func main() {
 	presetFlag := flag.String("preset", "", "Architecture preset (hexagonal, clean). Defaults to auto-detection")
 	configFlag := flag.String("config", ".arch-vet.yaml", "Path to configuration file")
 	diffFlag := flag.Bool("diff", false, "Only report violations in modified or untracked Git files")
-	formatFlag := flag.String("format", "text", "Output format (text, json, agent)")
+	formatFlag := flag.String("format", "text", "Output format (text, json, agent, sarif)")
 	noColorFlag := flag.Bool("no-color", false, "Disable ANSI color output")
 	versionFlag := flag.Bool("version", false, "Print version and exit")
 
@@ -96,6 +96,9 @@ func main() {
 				fmt.Printf("## Architecture Verification Passed\n\nNo modified or untracked Go files detected in Git working tree.\n")
 			} else if *formatFlag == "json" {
 				fmt.Println(`{"total_violations": 0, "violations": []}`)
+			} else if *formatFlag == "sarif" {
+				rep := &reporter.SARIFReporter{ToolVersion: Version}
+				_ = rep.Report(os.Stdout, nil)
 			} else {
 				fmt.Println("✓ Architecture clean: no modified files to check.")
 			}
@@ -126,6 +129,8 @@ func main() {
 		rep = &reporter.JSONReporter{}
 	case "agent", "ai":
 		rep = &reporter.AgentReporter{}
+	case "sarif":
+		rep = &reporter.SARIFReporter{ToolVersion: Version}
 	default:
 		rep = &reporter.TerminalReporter{NoColor: *noColorFlag}
 	}

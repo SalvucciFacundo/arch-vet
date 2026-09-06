@@ -66,3 +66,20 @@ func TestAgentReporter(t *testing.T) {
 		t.Errorf("expected agent output to contain markdown header and self-healing action, got: %s", out)
 	}
 }
+
+func TestSARIFReporter(t *testing.T) {
+	rep := &SARIFReporter{ToolVersion: "0.2.0-test"}
+	var buf bytes.Buffer
+	err := rep.Report(&buf, sampleDiagnostics())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	out := buf.String()
+	if !strings.Contains(out, `"version": "2.1.0"`) ||
+		!strings.Contains(out, `"name": "arch-vet"`) ||
+		!strings.Contains(out, `"ruleId": "ARCH001"`) ||
+		!strings.Contains(out, `"startLine": 12`) {
+		t.Errorf("expected SARIF output to contain schema 2.1.0, arch-vet driver, and ARCH001 result, got: %s", out)
+	}
+}

@@ -205,13 +205,30 @@ Usage of arch-vet:
   -dir string
         Root directory of the Go project (default ".")
   -format string
-        Output format: text, json, agent (default "text")
+        Output format: text, json, agent, sarif (default "text")
   -no-color
         Disable ANSI color output in terminal
   -preset string
         Architecture preset: hexagonal, clean (defaults to auto-detection)
   -version
         Print version and exit
+```
+
+---
+
+## GitHub Actions & Code Scanning (SARIF)
+
+To display architectural violations directly as inline code annotations on GitHub Pull Requests:
+
+```yaml
+      - name: Run arch-vet with SARIF
+        run: arch-vet -format sarif > results.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
 ```
 
 ---
