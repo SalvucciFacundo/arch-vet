@@ -49,8 +49,8 @@ func TestMCPServer_InitializeAndToolsList(t *testing.T) {
 		t.Fatalf("expected result map in tools response")
 	}
 	tools, ok := resMap["tools"].([]interface{})
-	if !ok || len(tools) != 3 {
-		t.Fatalf("expected 3 tools in list, got %v", tools)
+	if !ok || len(tools) != 4 {
+		t.Fatalf("expected 4 tools in list, got %v", tools)
 	}
 
 	// Verify tools/call response

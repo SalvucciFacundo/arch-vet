@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/SalvucciFacundo/arch-vet/internal/analyzer"
 	"github.com/SalvucciFacundo/arch-vet/internal/config"
+	"github.com/SalvucciFacundo/arch-vet/internal/git"
 	"github.com/SalvucciFacundo/arch-vet/internal/reporter"
 	"github.com/SalvucciFacundo/arch-vet/internal/rules"
 	"gopkg.in/yaml.v3"
@@ -29,6 +31,19 @@ func ListTools() []Tool {
 					"preset": map[string]interface{}{
 						"type":        "string",
 						"description": "Architecture preset to enforce (hexagonal, clean). Defaults to auto-detection.",
+					},
+				},
+			},
+		},
+		{
+			Name:        "check_diff",
+			Description: "Verify only modified or untracked Go files in the Git working tree for rapid sub-50ms feedback during agent coding loops.",
+			InputSchema: map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"dir": map[string]interface{}{
+						"type":        "string",
+						"description": "Root directory of the Go project (defaults to current working directory).",
 					},
 				},
 			},
@@ -123,6 +138,74 @@ func HandleVerifyArchitecture(args json.RawMessage) (*CallToolResult, error) {
 
 	return &CallToolResult{
 		IsError: len(diagnostics) > 0,
+		Content: []ToolResultContent{{Type: "text", Text: buf.String()}},
+	}, nil
+}
+
+// HandleCheckDiff verifies only modified or untracked Go files in the Git working tree.
+func HandleCheckDiff(args json.RawMessage) (*CallToolResult, error) {
+	var params struct {
+		Dir string `json:"dir"`
+	}
+	_ = json.Unmarshal(args, &params)
+	if params.Dir == "" {
+		params.Dir = "."
+	}
+
+	modifiedFiles, err := git.GetModifiedFiles(params.Dir)
+	if err != nil {
+		return &CallToolResult{
+			IsError: true,
+			Content: []ToolResultContent{{Type: "text", Text: fmt.Sprintf("Failed to check Git status: %v", err)}},
+		}, nil
+	}
+
+	if len(modifiedFiles) == 0 {
+		return &CallToolResult{
+			Content: []ToolResultContent{{Type: "text", Text: "## Architecture Verification Passed\n\nNo modified or untracked Go files detected in Git working tree."}},
+		}, nil
+	}
+
+	// 1. Resolve configuration
+	cfg := config.DetectArchitecture(params.Dir)
+
+	// 2. Load project packages
+	project, err := analyzer.LoadProject(params.Dir)
+	if err != nil {
+		return &CallToolResult{
+			IsError: true,
+			Content: []ToolResultContent{{Type: "text", Text: fmt.Sprintf("Failed to load Go packages in %s: %v", params.Dir, err)}},
+		}, nil
+	}
+
+	// 3. Evaluate rules
+	ctx := &rules.Context{Config: cfg, Project: project}
+	engine := rules.NewEngine()
+	diagnostics := engine.Evaluate(ctx)
+
+	// 4. Filter diagnostics to modified files only
+	modMap := make(map[string]bool)
+	for _, f := range modifiedFiles {
+		modMap[filepath.ToSlash(f)] = true
+	}
+
+	var filtered []rules.Diagnostic
+	for _, d := range diagnostics {
+		relFile, err := filepath.Rel(params.Dir, d.Position.Filename)
+		if err == nil && modMap[filepath.ToSlash(relFile)] {
+			filtered = append(filtered, d)
+		} else if modMap[filepath.ToSlash(d.Position.Filename)] {
+			filtered = append(filtered, d)
+		}
+	}
+
+	// 5. Format report
+	var buf bytes.Buffer
+	agentRep := &reporter.AgentReporter{}
+	_ = agentRep.Report(&buf, filtered)
+
+	return &CallToolResult{
+		IsError: len(filtered) > 0,
 		Content: []ToolResultContent{{Type: "text", Text: buf.String()}},
 	}, nil
 }

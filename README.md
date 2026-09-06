@@ -120,7 +120,8 @@ Add `arch-vet` to your AI agent configuration (e.g. `~/.config/claude/claude_des
 ### Exposed MCP Tools:
 | Tool Name | Description |
 | :--- | :--- |
-| `verify_architecture` | Audits the project and returns structured violations with actionable self-healing guidance. |
+| `check_diff` | Verifies only modified or untracked Go files in the Git working tree for rapid sub-50ms feedback during agent edits. |
+| `verify_architecture` | Audits the whole project and returns structured violations with actionable self-healing guidance. |
 | `get_architectural_map` | Provides the agent with the blueprint of layers and allowed dependency flows before generating code. |
 | `explain_rule` | Explains the architectural principles behind rules with concrete Go refactoring code examples. |
 
@@ -181,6 +182,8 @@ layers:
 Usage of arch-vet:
   -config string
         Path to custom configuration file (default ".arch-vet.yaml")
+  -diff
+        Only report violations in modified or untracked Git files
   -dir string
         Root directory of the Go project (default ".")
   -format string

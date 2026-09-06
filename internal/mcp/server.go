@@ -100,6 +100,8 @@ func (s *Server) handleRequest(req *JSONRPCRequest) JSONRPCResponse {
 		switch params.Name {
 		case "verify_architecture":
 			result, err = HandleVerifyArchitecture(params.Arguments)
+		case "check_diff":
+			result, err = HandleCheckDiff(params.Arguments)
 		case "get_architectural_map":
 			result, err = HandleGetArchitecturalMap(params.Arguments)
 		case "explain_rule":

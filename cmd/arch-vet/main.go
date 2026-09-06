@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/SalvucciFacundo/arch-vet/internal/analyzer"
 	"github.com/SalvucciFacundo/arch-vet/internal/config"
+	"github.com/SalvucciFacundo/arch-vet/internal/git"
 	"github.com/SalvucciFacundo/arch-vet/internal/mcp"
 	"github.com/SalvucciFacundo/arch-vet/internal/reporter"
 	"github.com/SalvucciFacundo/arch-vet/internal/rules"
@@ -27,6 +29,7 @@ func main() {
 	dirFlag := flag.String("dir", ".", "Root directory of the Go project")
 	presetFlag := flag.String("preset", "", "Architecture preset (hexagonal, clean). Defaults to auto-detection")
 	configFlag := flag.String("config", ".arch-vet.yaml", "Path to configuration file")
+	diffFlag := flag.Bool("diff", false, "Only report violations in modified or untracked Git files")
 	formatFlag := flag.String("format", "text", "Output format (text, json, agent)")
 	noColorFlag := flag.Bool("no-color", false, "Disable ANSI color output")
 	versionFlag := flag.Bool("version", false, "Print version and exit")
@@ -81,7 +84,42 @@ func main() {
 	engine := rules.NewEngine()
 	diagnostics := engine.Evaluate(ctx)
 
-	// 4. Report results
+	// 4. If --diff specified, filter diagnostics to only modified files
+	if *diffFlag {
+		modifiedFiles, err := git.GetModifiedFiles(*dirFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error getting modified files from git: %v\n", err)
+			os.Exit(2)
+		}
+		if len(modifiedFiles) == 0 {
+			if *formatFlag == "agent" || *formatFlag == "ai" {
+				fmt.Printf("## Architecture Verification Passed\n\nNo modified or untracked Go files detected in Git working tree.\n")
+			} else if *formatFlag == "json" {
+				fmt.Println(`{"total_violations": 0, "violations": []}`)
+			} else {
+				fmt.Println("✓ Architecture clean: no modified files to check.")
+			}
+			os.Exit(0)
+		}
+
+		modMap := make(map[string]bool)
+		for _, f := range modifiedFiles {
+			modMap[filepath.ToSlash(f)] = true
+		}
+
+		var filtered []rules.Diagnostic
+		for _, d := range diagnostics {
+			relFile, err := filepath.Rel(*dirFlag, d.Position.Filename)
+			if err == nil && modMap[filepath.ToSlash(relFile)] {
+				filtered = append(filtered, d)
+			} else if modMap[filepath.ToSlash(d.Position.Filename)] {
+				filtered = append(filtered, d)
+			}
+		}
+		diagnostics = filtered
+	}
+
+	// 5. Report results
 	var rep reporter.Reporter
 	switch *formatFlag {
 	case "json":
